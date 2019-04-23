@@ -1,0 +1,1 @@
+cp ./measure.log /media/yuan/remote-fs/

