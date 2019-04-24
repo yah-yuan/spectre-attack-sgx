@@ -129,7 +129,6 @@ signed_enclave: enclave
 
 sgxspectre: main.o enclave_u.o enclave_init.o signed_enclave
 	$(CC) $(CFLAGS) -o $@ main/main.o main/enclave_u.o main/enclave_init.o $(App_Link_Flags) -lpthread
-	./sgxspectre
 
 clean:
 	find . -iname "enclave_u.?" -delete

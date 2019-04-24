@@ -1,2 +1,4 @@
-1 time 0.57136 rate 1792.20 accuracy 0.00097656
-2 time 0.37593 rate 2723.93 accuracy 0.71289062
+train_per_round time rate accuracy1 time 0.60575 rate 1690.458 accuracy 0.00097656
+2 time 0.37804 rate 2708.729 accuracy 0.68652344
+3 time 0.75174 rate 1362.175 accuracy 0.92187500
+4 time 0.85136 rate 1202.788 accuracy 0.93554688

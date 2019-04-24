@@ -174,9 +174,10 @@ int spectre_main() {
     }
 
     //measurements
+    // variable time rate accuracy
     fprintf(log_file,"%d ",train_per_round);//
     fprintf(log_file,"time %.5f ",((float)total_time/NANO));
-    fprintf(log_file,"rate %.2f ",(float)secret_len / ((float)total_time/NANO) );
+    fprintf(log_file,"rate %.3f ",(float)secret_len / ((float)total_time/NANO) );
     fprintf(log_file,"accuracy %.8f\n",(float)correct/(float)secret_len);
     fflush(log_file);
 
@@ -212,8 +213,8 @@ int main(int argc, char *argv[])
     secret_len = 1024;
     block_size = 1;
 
-
-    for(i = 0; i < 100; i++) 
+    fprintf(log_file,"train_per_round time rate accuracy\n");
+    for(i = 0; i < 50; i++) 
     {
         //reset
         correct = 0;
