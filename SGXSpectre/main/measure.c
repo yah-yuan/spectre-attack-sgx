@@ -1,6 +1,8 @@
 #include <time.h>
 #include <stdio.h>
 
+#define NANO 1000000000
+
 long long int nano_timeval(struct timespec start, struct timespec end)
 {
     struct timespec temp;
@@ -11,7 +13,7 @@ long long int nano_timeval(struct timespec start, struct timespec end)
         temp.tv_sec = end.tv_sec-start.tv_sec;
         temp.tv_nsec = end.tv_nsec-start.tv_nsec;
     }
-    return temp.tv_sec * 1000000000 + temp.tv_nsec;
+    return temp.tv_sec * NANO + temp.tv_nsec;
 }
 
 #ifndef IN_JOB //for measurements only
