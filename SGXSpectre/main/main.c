@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
         //variable
         train_per_round = i + 1;
         /* Call the main attack function*/
-        // printf("\rTest NO. %d ... ...",i);
+        printf("\rTest NO. %d ... ...",i);
         fflush(stdout);
         spectre_main(); 
     }
