@@ -203,7 +203,7 @@ int C_flow(char * file_name)
 
     //defaults
     cache_hit_threshold = 80;
-    try_runs = 8;
+    try_runs = 16;
     train_rounds = 5;
     train_per_round = 6;
     secret_len = 100;
@@ -218,8 +218,8 @@ int C_flow(char * file_name)
     fprintf(log_file,"secret_len            %d\n",secret_len);
     fprintf(log_file,"block_size            %d\n",block_size);
     fprintf(log_file,"\n");
-    
-    fprintf(log_file,"cache_hit_threshold time rate accuracy\n");
+
+    fprintf(log_file,"try_runs time rate accuracy\n");
     for(i = 0; i < 300; i++) 
     {
         //reset
@@ -227,8 +227,8 @@ int C_flow(char * file_name)
         total_time = 0;
 
         //variable
-        cache_hit_threshold = i;
-        variable = cache_hit_threshold;
+        try_runs = i + 1;
+        variable = try_runs;
         /* Call the main attack function*/
         printf("\rTest NO. %d ... ...",i);
         fflush(stdout);
