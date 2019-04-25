@@ -55,6 +55,7 @@ int train_rounds;
 int train_per_round;
 int secret_len;
 int block_size;
+int variable;
 
 /********************************************************************
  Analysis code
@@ -175,7 +176,7 @@ int spectre_main() {
 
     //measurements
     // variable time rate accuracy
-    fprintf(log_file,"%d ",train_per_round);//
+    fprintf(log_file,"%d ",variable);//
     fprintf(log_file,"%.5f ",((float)total_time/NANO));
     fprintf(log_file,"%.5f ",(float)secret_len / ((float)total_time/NANO) );
     fprintf(log_file,"%.8f\n",(float)correct/(float)secret_len);
@@ -199,30 +200,31 @@ int C_flow(char * file_name)
 
     /* Initialize the enclave */
     initialize_enclave();
-    //default
 
+    //defaults
     cache_hit_threshold = 80;
     try_times = 8;
     train_rounds = 5;
     train_per_round = 6;
-    secret_len = 1024;
+    secret_len = 40;
     block_size = 1;
 
-    fprintf(log_file,"train_per_round time rate accuracy\n");
-    for(i = 0; i < 25; i++) 
+    fprintf(log_file,"cache_hit_threshold time rate accuracy\n");
+    for(i = 0; i < 400; i++) 
     {
         //reset
         correct = 0;
         total_time = 0;
 
         //variable
-        train_per_round = i + 1;
+        cache_hit_threshold = i;
+        variable = cache_hit_threshold;
         /* Call the main attack function*/
         printf("\rTest NO. %d ... ...",i);
         fflush(stdout);
         spectre_main(); 
     }
-    printf("\n");
+    printf("\rDone                 \n");
 
     /* Destroy the enclave */
     destroy_enclave();
