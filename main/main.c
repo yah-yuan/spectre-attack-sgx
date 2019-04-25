@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
+#include <string.h>
 #ifdef _MSC_VER
 #include <intrin.h> /* for rdtscp and clflush */
 #pragma optimize("gt",on)
@@ -43,7 +44,6 @@ uint8_t array2[256 * 512];
 
 struct timespec measure_time1, measure_time2;
 FILE * log_file;
-char * file_name = "measure.log";
 char *secret = "At a seminar in the Bell Communications Research Colloquia Series, Dr. Richard W. Hamming, a Professor at the Naval Postgraduate School in Monterey, California and a retired Bell Labs scientist, gave a very interesting and stimulating talk, `You and Your Research' to an overflow audience of some 200 Bellcore staff members and visitors at the Morris Research and Engineering Center on March 7, 1986. This talk centered on Hamming's observations and research on the question ``Why do so few scientists make significant contributions and so many are forgotten in the long run?'' From his more than forty years of experience, thirty of which were at Bell Laboratories, he has made a number of direct observations, asked very pointed questions of scientists about what, how, and why they did things, studied the lives of great scientists and great contributions, and has done introspection and studied theories of creativity. The talk is about what he has learned in terms of the properties of the individual scientists, their abilities, traits, working habits, attitudes, and philosophy. ";
 // char *secret = "The Magic Words are Squeamish Ossifrage.";
 int correct = 0;
@@ -176,31 +176,26 @@ int spectre_main() {
     //measurements
     // variable time rate accuracy
     fprintf(log_file,"%d ",train_per_round);//
-    fprintf(log_file,"time %.5f ",((float)total_time/NANO));
-    fprintf(log_file,"rate %.3f ",(float)secret_len / ((float)total_time/NANO) );
-    fprintf(log_file,"accuracy %.8f\n",(float)correct/(float)secret_len);
+    fprintf(log_file,"%.5f ",((float)total_time/NANO));
+    fprintf(log_file,"%.5f ",(float)secret_len / ((float)total_time/NANO) );
+    fprintf(log_file,"%.8f\n",(float)correct/(float)secret_len);
     fflush(log_file);
 
     return (0);
  }
 
 /* Application entry */
-int main(int argc, char *argv[])
+int C_flow(char * file_name)
 {
     int i;
-    time_t tmpcal_ptr;
-    struct tm *tmp_ptr;
-    log_file = fopen(file_name, "wb");
+    log_file = fopen(file_name, "w");
     if (log_file == 0)
     {
         printf("openfailed\n");
         exit(1);
     }
     
-    tmpcal_ptr = time(NULL);
-    tmp_ptr = localtime(&tmpcal_ptr);
-    printf ("Start time is:%d.%d.%d ", (1900+tmp_ptr->tm_year), (1+tmp_ptr->tm_mon), tmp_ptr->tm_mday);
-    printf("%d:%d:%d\n", tmp_ptr->tm_hour, tmp_ptr->tm_min, tmp_ptr->tm_sec);
+    fprint_time(log_file,"Start time");
 
     /* Initialize the enclave */
     initialize_enclave();
@@ -214,7 +209,7 @@ int main(int argc, char *argv[])
     block_size = 1;
 
     fprintf(log_file,"train_per_round time rate accuracy\n");
-    for(i = 0; i < 50; i++) 
+    for(i = 0; i < 25; i++) 
     {
         //reset
         correct = 0;
@@ -227,17 +222,32 @@ int main(int argc, char *argv[])
         fflush(stdout);
         spectre_main(); 
     }
- 
+    printf("\n");
 
     /* Destroy the enclave */
     destroy_enclave();
+    
+    fprint_time(log_file,"End time");
     fclose(log_file);
-
-    tmpcal_ptr = time(NULL);
-    tmp_ptr = localtime(&tmpcal_ptr);
-    printf ("End time is:%d.%d.%d ", (1900+tmp_ptr->tm_year), (1+tmp_ptr->tm_mon), tmp_ptr->tm_mday);
-    printf("%d:%d:%d\n", tmp_ptr->tm_hour, tmp_ptr->tm_min, tmp_ptr->tm_sec);
 
     return 0;
 }
 
+int main(){
+    char * file_name = ".log";
+    char buffer[20];
+    int count;
+
+    print_time("START time");
+    
+    buffer[1] = 0;
+    for(count = 0; count < 10; count++) {
+        sprintf(buffer,"result/%d",count);
+        strcat(buffer,file_name);
+        printf("working on the %d Test...\n",count);
+        C_flow(buffer);
+    }
+
+    print_time("END time");
+    return 0;
+}

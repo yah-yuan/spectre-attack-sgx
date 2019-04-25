@@ -29,3 +29,27 @@ int main()
     return 0;
 }
 #endif
+
+void fprint_time(FILE *fd, char * desc){
+
+    time_t tmpcal_ptr;
+    struct tm *tmp_ptr;
+
+    tmpcal_ptr = time(NULL);
+    tmp_ptr = localtime(&tmpcal_ptr);
+    fprintf(fd,"%s",desc);
+    fprintf (fd,":%d.%d.%d ", (1900+tmp_ptr->tm_year), (1+tmp_ptr->tm_mon), tmp_ptr->tm_mday);
+    fprintf(fd,"%d:%d:%d\n", tmp_ptr->tm_hour, tmp_ptr->tm_min, tmp_ptr->tm_sec);
+}
+
+void print_time(char * desc){
+
+    time_t tmpcal_ptr;
+    struct tm *tmp_ptr;
+
+    tmpcal_ptr = time(NULL);
+    tmp_ptr = localtime(&tmpcal_ptr);
+    printf("%s",desc);
+    printf (":%d.%d.%d ", (1900+tmp_ptr->tm_year), (1+tmp_ptr->tm_mon), tmp_ptr->tm_mday);
+    printf("%d:%d:%d\n", tmp_ptr->tm_hour, tmp_ptr->tm_min, tmp_ptr->tm_sec);
+}
