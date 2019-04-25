@@ -220,8 +220,8 @@ int C_flow(char * file_name)
     fprintf(log_file,"block_size            %d\n",block_size);
     fprintf(log_file,"\n");
 
-    test_obj = &cache_hit_threshold;
-    fprintf(log_file,"cache_hit_threshold time rate accuracy\n");
+    test_obj = &try_runs;
+    fprintf(log_file,"try_runs time rate accuracy\n");
     for(i = 0; i < 300; i++) 
     {
         //reset
