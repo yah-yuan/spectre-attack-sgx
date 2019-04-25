@@ -50,7 +50,7 @@ int correct = 0;
 long long total_time = 0;
 
 int cache_hit_threshold;
-int try_times;
+int try_runs;
 int train_rounds;
 int train_per_round;
 int secret_len;
@@ -73,7 +73,7 @@ int variable;
     for (i = 0; i < 256; i++)
         results[i] = 0;
 
-    for (tries = try_times; tries > 0 ; tries--) {
+    for (tries = 0; tries < try_runs ; tries++) {
         /* Flush array2[256*(0..255)] from cache */
         for (i = 0; i < 256; i++)
         _mm_clflush(&array2[i * 512]); /* intrinsic for clflush instruction */
@@ -203,14 +203,24 @@ int C_flow(char * file_name)
 
     //defaults
     cache_hit_threshold = 80;
-    try_times = 50;
+    try_runs = 8;
     train_rounds = 5;
     train_per_round = 6;
-    secret_len = 40;
+    secret_len = 100;
     block_size = 1;
 
+    fprintf(log_file,"\n");
+    fprintf(log_file,"defaults:\n");
+    fprintf(log_file,"cache_hit_threshold   %d\n",cache_hit_threshold);
+    fprintf(log_file,"try_runs              %d\n",try_runs);
+    fprintf(log_file,"train_rounds          %d\n",train_rounds);
+    fprintf(log_file,"train_per_round       %d\n",train_per_round);
+    fprintf(log_file,"secret_len            %d\n",secret_len);
+    fprintf(log_file,"block_size            %d\n",block_size);
+    fprintf(log_file,"\n");
+    
     fprintf(log_file,"cache_hit_threshold time rate accuracy\n");
-    for(i = 0; i < 400; i++) 
+    for(i = 0; i < 300; i++) 
     {
         //reset
         correct = 0;
