@@ -222,7 +222,7 @@ int C_flow(char * file_name)
 
     test_obj = &train_rounds;
     fprintf(log_file,"train_rounds time rate accuracy\n");
-    for(i = 0; i < 20; i++) 
+    for(i = 0; i < 100; i++) 
     {
         //reset
         correct = 0;
