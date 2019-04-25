@@ -57,3 +57,4 @@ dkms.conf
 enclave_t.*
 enclave_u.*
 sgxspectre
+*.log
