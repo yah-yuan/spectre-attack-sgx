@@ -206,7 +206,7 @@ int C_flow(char * file_name)
     cache_hit_threshold = 80;
     try_runs = 16;
     train_rounds = 5;
-    train_per_round = 6;
+    train_per_round = 3;
     secret_len = 40;
     block_size = 1;
 
@@ -222,7 +222,7 @@ int C_flow(char * file_name)
 
     test_obj = &try_runs;
     fprintf(log_file,"try_runs time rate accuracy\n");
-    for(i = 0; i < 300; i++) 
+    for(i = 0; i < 100; i++) 
     {
         //reset
         correct = 0;
