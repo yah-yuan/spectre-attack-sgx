@@ -255,7 +255,7 @@ int main(){
     print_time("START time");
     
     buffer[1] = 0;
-    for(count = 0; count < 32; count++) {
+    for(count = 0; count < 5; count++) {
         sprintf(buffer,"result/%d",count);
         strcat(buffer,file_name);
         printf("working on the %d Test...\n",count);
