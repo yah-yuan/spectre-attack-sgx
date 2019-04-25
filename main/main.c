@@ -204,8 +204,8 @@ int C_flow(char * file_name)
 
     //defaults
     cache_hit_threshold = 80;
-    try_runs = 1;
-    train_rounds = 1;
+    try_runs = 100;
+    train_rounds = 5;
     train_per_round = 3;
     secret_len = 1000;
     block_size = 1;
@@ -220,16 +220,16 @@ int C_flow(char * file_name)
     fprintf(log_file,"block_size            %d\n",block_size);
     fprintf(log_file,"\n");
 
-    test_obj = &train_per_round;
-    fprintf(log_file,"train_per_round time rate accuracy\n");
-    for(i = 0; i < 20; i++) 
+    test_obj = &block_size;
+    fprintf(log_file,"block_size time rate accuracy\n");
+    for(i = 0; i < 50; i++) 
     {
         //reset
         correct = 0;
         total_time = 0;
 
         //variable
-        *test_obj = i + 1;
+        *test_obj = 1;
         variable = *test_obj;
         /* Call the main attack function*/
         printf("\rTest NO. %d ... ...",i);
@@ -255,7 +255,7 @@ int main(){
     print_time("START time");
     
     buffer[1] = 0;
-    for(count = 0; count < 5; count++) {
+    for(count = 0; count < 1; count++) {
         sprintf(buffer,"result/%d",count);
         strcat(buffer,file_name);
         printf("working on the %d Test...\n",count);
