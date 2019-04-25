@@ -202,7 +202,7 @@ int C_flow(char * file_name)
     //default
 
     cache_hit_threshold = 80;
-    try_times = 16;
+    try_times = 4;
     train_rounds = 5;
     train_per_round = 6;
     secret_len = 1024;
