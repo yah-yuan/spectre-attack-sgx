@@ -189,6 +189,7 @@ int spectre_main() {
 int C_flow(char * file_name)
 {
     int i;
+    int * test_obj;
     log_file = fopen(file_name, "w");
     if (log_file == 0)
     {
@@ -206,7 +207,7 @@ int C_flow(char * file_name)
     try_runs = 16;
     train_rounds = 5;
     train_per_round = 6;
-    secret_len = 100;
+    secret_len = 40;
     block_size = 1;
 
     fprintf(log_file,"\n");
@@ -219,7 +220,8 @@ int C_flow(char * file_name)
     fprintf(log_file,"block_size            %d\n",block_size);
     fprintf(log_file,"\n");
 
-    fprintf(log_file,"try_runs time rate accuracy\n");
+    test_obj = &train_per_round;
+    fprintf(log_file,"train_per_round time rate accuracy\n");
     for(i = 0; i < 300; i++) 
     {
         //reset
@@ -227,8 +229,8 @@ int C_flow(char * file_name)
         total_time = 0;
 
         //variable
-        try_runs = i + 1;
-        variable = try_runs;
+        *test_obj = i + 1;
+        variable = *test_obj;
         /* Call the main attack function*/
         printf("\rTest NO. %d ... ...",i);
         fflush(stdout);
