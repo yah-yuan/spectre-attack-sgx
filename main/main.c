@@ -204,10 +204,10 @@ int C_flow(char * file_name)
 
     //defaults
     cache_hit_threshold = 80;
-    try_runs = 8;
-    train_rounds = 5;
+    try_runs = 2;
+    train_rounds = 2;
     train_per_round = 3;
-    secret_len = 40;
+    secret_len = 1000;
     block_size = 1;
 
     fprintf(log_file,"\n");
