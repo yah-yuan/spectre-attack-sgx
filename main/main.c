@@ -204,7 +204,7 @@ int C_flow(char * file_name)
 
     //defaults
     cache_hit_threshold = 80;
-    try_runs = 1;
+    try_runs = 8;
     train_rounds = 5;
     train_per_round = 3;
     secret_len = 40;
@@ -220,9 +220,9 @@ int C_flow(char * file_name)
     fprintf(log_file,"block_size            %d\n",block_size);
     fprintf(log_file,"\n");
 
-    test_obj = &train_rounds;
-    fprintf(log_file,"train_rounds time rate accuracy\n");
-    for(i = 0; i < 100; i++) 
+    test_obj = &train_per_round;
+    fprintf(log_file,"train_per_round time rate accuracy\n");
+    for(i = 0; i < 20; i++) 
     {
         //reset
         correct = 0;
