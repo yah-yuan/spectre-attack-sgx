@@ -50,4 +50,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+
 .vscode
+
+enclave_t.*
+enclave_u.*
+sgxspectre
