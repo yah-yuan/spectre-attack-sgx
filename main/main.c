@@ -206,7 +206,7 @@ int C_flow(char * file_name)
     cache_hit_threshold = 80;
     try_runs = 16;
     train_rounds = 5;
-    train_per_round = 24;
+    train_per_round = 6;
     secret_len = 40;
     block_size = 1;
 
